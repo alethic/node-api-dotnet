@@ -14,7 +14,8 @@
         <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     </PropertyGroup>
 
-    <!-- Directory.Build.props normally imports this already; native projects built outside the repo tree get it here. -->
+    <!-- Directory.Build.props normally imports these already; native projects built outside the repo tree get them here. -->
+    <Import Project="$(MSBuildThisFileDirectory)..\rid.props" Condition=" '$(_RuntimesPropsImported)' != 'true' " />
     <Import Project="$(MSBuildThisFileDirectory)runtimes.props" Condition=" '$(_RuntimesPropsImported)' != 'true' " />
 
     <PropertyGroup>

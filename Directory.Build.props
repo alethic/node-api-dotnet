@@ -1,7 +1,4 @@
 <Project>
-  <!-- Runtime identifiers for native (IKVM.Clang) projects such as the libnode embedding shim. -->
-  <Import Project="targets\runtimes.props" />
-
   <PropertyGroup>
     <IsDotNet10SdkAvailable Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(MSBuildVersion)', '17.15'))">true</IsDotNet10SdkAvailable>
     <AotTargetFramework Condition="'$(IsDotNet10SdkAvailable)' != 'true'">net9.0</AotTargetFramework>
@@ -86,4 +83,7 @@
   </PropertyGroup>
 
   <Import Project="./rid.props" />
+
+  <!-- Runtime identifiers for native (IKVM.Clang) projects such as the libnode embedding shim (after rid.props). -->
+  <Import Project="targets\runtimes.props" />
 </Project>

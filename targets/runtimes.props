@@ -2,12 +2,13 @@
 
     runtimes.props
 
-    Runtime identifiers for native (IKVM.Clang) projects, shared by Directory.Build.props (for .NET
-    projects referencing them) and lib.props (for the native projects themselves).
+    Runtime identifiers for native (IKVM.Clang) projects, in the shape IKVM's Directory.Build.props
+    uses: SupportedRuntimes is every RID we ship; EnabledRuntimes is what this build compiles.
 
-    SupportedRuntimes is every RID we ship; EnabledRuntimes is what this build actually compiles.
-    Cross-compiling needs per-RID sysroots that are not wired up yet, so the default is the host RID
-    only; CI overrides EnabledRuntimes once sysroots are in place.
+    IKVM defaults EnabledRuntimes to all of SupportedRuntimes because it cross-compiles everything
+    through per-RID sysroots. Those are not wired up here yet, so the default is the host RID, taken
+    from $(RuntimeIdentifier) as computed by rid.props (import that first). CI overrides
+    EnabledRuntimes once sysroots are in place.
 
 -->
 
@@ -19,13 +20,7 @@
 
     <PropertyGroup>
         <SupportedRuntimes Condition=" '$(SupportedRuntimes)' == '' ">win-x64;win-arm64;linux-x64;linux-arm64;osx-x64;osx-arm64</SupportedRuntimes>
-        <!-- Derived from OS + architecture rather than RuntimeInformation.RuntimeIdentifier, which Visual Studio's
-             .NET Framework MSBuild does not have. -->
-        <_HostArch>$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant())</_HostArch>
-        <HostRuntimeIdentifier Condition=" '$(HostRuntimeIdentifier)' == '' AND $([MSBuild]::IsOSPlatform('Windows')) ">win-$(_HostArch)</HostRuntimeIdentifier>
-        <HostRuntimeIdentifier Condition=" '$(HostRuntimeIdentifier)' == '' AND $([MSBuild]::IsOSPlatform('Linux')) ">linux-$(_HostArch)</HostRuntimeIdentifier>
-        <HostRuntimeIdentifier Condition=" '$(HostRuntimeIdentifier)' == '' AND $([MSBuild]::IsOSPlatform('OSX')) ">osx-$(_HostArch)</HostRuntimeIdentifier>
-        <EnabledRuntimes Condition=" '$(EnabledRuntimes)' == '' ">$(HostRuntimeIdentifier)</EnabledRuntimes>
+        <EnabledRuntimes Condition=" '$(EnabledRuntimes)' == '' ">$(RuntimeIdentifier)</EnabledRuntimes>
         <_SupportedRuntimes>;$(SupportedRuntimes);</_SupportedRuntimes>
         <_EnabledRuntimes>;$(EnabledRuntimes);</_EnabledRuntimes>
     </PropertyGroup>
