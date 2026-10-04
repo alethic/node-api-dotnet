@@ -19,7 +19,12 @@
 
     <PropertyGroup>
         <SupportedRuntimes Condition=" '$(SupportedRuntimes)' == '' ">win-x64;win-arm64;linux-x64;linux-arm64;osx-x64;osx-arm64</SupportedRuntimes>
-        <HostRuntimeIdentifier Condition=" '$(HostRuntimeIdentifier)' == '' ">$([System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier)</HostRuntimeIdentifier>
+        <!-- Derived from OS + architecture rather than RuntimeInformation.RuntimeIdentifier, which Visual Studio's
+             .NET Framework MSBuild does not have. -->
+        <_HostArch>$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant())</_HostArch>
+        <HostRuntimeIdentifier Condition=" '$(HostRuntimeIdentifier)' == '' AND $([MSBuild]::IsOSPlatform('Windows')) ">win-$(_HostArch)</HostRuntimeIdentifier>
+        <HostRuntimeIdentifier Condition=" '$(HostRuntimeIdentifier)' == '' AND $([MSBuild]::IsOSPlatform('Linux')) ">linux-$(_HostArch)</HostRuntimeIdentifier>
+        <HostRuntimeIdentifier Condition=" '$(HostRuntimeIdentifier)' == '' AND $([MSBuild]::IsOSPlatform('OSX')) ">osx-$(_HostArch)</HostRuntimeIdentifier>
         <EnabledRuntimes Condition=" '$(EnabledRuntimes)' == '' ">$(HostRuntimeIdentifier)</EnabledRuntimes>
         <_SupportedRuntimes>;$(SupportedRuntimes);</_SupportedRuntimes>
         <_EnabledRuntimes>;$(EnabledRuntimes);</_EnabledRuntimes>
