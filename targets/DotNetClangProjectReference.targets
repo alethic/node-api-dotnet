@@ -2,23 +2,17 @@
 
     DotNetClangProjectReference.targets
 
-    Lets a .NET project reference an IKVM.Clang project once and have it built for every enabled
-    runtime identifier (from https://github.com/ikvmnet/ikvm, MIT):
+    From IKVM (IKVM.libs.targets, verbatim target): a .NET project declares
 
         <DotNetClangProjectReference Include="..\LibNodeShim\LibNodeShim.clangproj" />
 
-    Each enabled RID becomes a ClangProjectReference (see ClangProjectReference.targets), whose
-    output lands at runtimes/<rid>/native/ in the build output, the package and the .deps.json.
-    Optional SupportedRuntimes metadata restricts a reference to a subset of RIDs.
+    and the native project is built for every enabled runtime identifier as a ClangProjectReference
+    (see ClangProjectReference.targets), landing under runtimes/<rid>/native.
 
 -->
 
 <Project>
-    <PropertyGroup>
-        <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-    </PropertyGroup>
-
-    <Target Name="GetDotNetClangProjectReferencesByRuntime" Inputs="@(DotNetClangProjectReference)" Outputs="%(DotNetClangProjectReference.Identity)\null" Condition=" '@(DotNetClangProjectReference)' != '' ">
+    <Target Name="GetDotNetClangProjectReferencesByRuntime" Inputs="@(DotNetClangProjectReference)" Outputs="%(DotNetClangProjectReference.Identity)\null" BeforeTargets="AssignClangProjectConfiguration">
         <PropertyGroup>
             <__SupportedRuntimes>%(DotNetClangProjectReference.SupportedRuntimes)</__SupportedRuntimes>
             <__SupportedRuntimes Condition=" '$(__SupportedRuntimes)' == '' ">$(_SupportedRuntimes)</__SupportedRuntimes>
@@ -33,14 +27,17 @@
             </_ReferencedClangProjectReference>
             <ClangProjectReference Include="@(_ReferencedClangProjectReference)" Condition="$(_EnabledRuntimes.Contains(';%(RuntimeIdentifier);'))">
                 <RuntimeIdentifier>%(RuntimeIdentifier)</RuntimeIdentifier>
+				<Pack>false</Pack>
+				<Pack Condition=" '$(PackIkvmDlls)' == 'true' ">$(PackIkvmDlls)</Pack>
             </ClangProjectReference>
         </ItemGroup>
     </Target>
 
     <!--
-        Runs ahead of AssignClangProjectConfiguration in the same dependency chain. (A BeforeTargets
-        hook is not enough: MSBuild decides a target's Condition before its BeforeTargets run, so items
-        created there would not satisfy AssignClangProjectConfiguration's '@(ClangProjectReference)' != ''.)
+        Differs from IKVM in one line: GetDotNetClangProjectReferencesByRuntime is listed FIRST. MSBuild evaluates a
+        target's Condition when the target is pushed, before its BeforeTargets run, so the ClangProjectReference items
+        created here would not satisfy AssignClangProjectConfiguration's '@(ClangProjectReference)' != '' condition
+        (verified on MSBuild 18.9 / SDK 10.0.401 and Visual Studio 2026's MSBuild).
     -->
     <PropertyGroup>
         <GetClangProjectReferencesDependsOn>

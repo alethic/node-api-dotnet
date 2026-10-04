@@ -24,3 +24,6 @@ test/TestCases/**/global.json
 
 # Local overrides for native projects
 *.local.props
+
+# Cross-compilation sysroots (downloaded; see targets/lib.props)
+ext/ikvm-native-sdk/

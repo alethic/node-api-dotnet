@@ -1,4 +1,12 @@
 <Project>
+  <!-- Native (IKVM.Clang) projects are built per runtime identifier; same shape as IKVM's Directory.Build.props. -->
+  <PropertyGroup Label="Runtime Info">
+    <SupportedRuntimes>win-x64;win-arm64;linux-x64;linux-arm64;osx-x64;osx-arm64</SupportedRuntimes>
+    <EnabledRuntimes Condition=" '$(EnabledRuntimes)' == '' ">$(SupportedRuntimes)</EnabledRuntimes>
+    <_SupportedRuntimes>;$(SupportedRuntimes);</_SupportedRuntimes>
+    <_EnabledRuntimes>;$(EnabledRuntimes);</_EnabledRuntimes>
+  </PropertyGroup>
+
   <PropertyGroup>
     <IsDotNet10SdkAvailable Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(MSBuildVersion)', '17.15'))">true</IsDotNet10SdkAvailable>
     <AotTargetFramework Condition="'$(IsDotNet10SdkAvailable)' != 'true'">net9.0</AotTargetFramework>
@@ -83,7 +91,4 @@
   </PropertyGroup>
 
   <Import Project="./rid.props" />
-
-  <!-- Runtime identifiers for native (IKVM.Clang) projects such as the libnode embedding shim (after rid.props). -->
-  <Import Project="targets\runtimes.props" />
 </Project>

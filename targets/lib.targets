@@ -1,8 +1,8 @@
 <!--
 
     lib.targets
-
-    Applies at the bottom of any native (IKVM.Clang) library project in this repo.
+    
+    Applies at the bottom of any native library project.
 
 -->
 
@@ -15,48 +15,6 @@
         <AdditionalLinkOptions>$(AdditionalLinkOptions);-Wl,-install_name,@rpath/lib$(TargetName).dylib</AdditionalLinkOptions>
     </PropertyGroup>
 
-    <!--
-        Windows host, Windows target: tell clang where the MSVC toolset and Windows SDK are. A standalone
-        clang does not detect current Visual Studio versions on its own; it only honors a developer
-        prompt's VCToolsInstallDir / INCLUDE / LIB. Use those when present (CI runs under msvc-dev-cmd),
-        otherwise resolve them with vswhere and the Windows Kits registry key so plain `dotnet build` works.
-    -->
-    <Target Name="ResolveMsvcToolchain" BeforeTargets="CoreCompile;CoreLink" Condition="$([MSBuild]::IsOSPlatform('Windows')) AND $(TargetIdentifier.StartsWith('win-')) AND '$(VCToolsInstallDir)' == ''">
-        <Exec Command="&quot;$(MSBuildProgramFiles32)\Microsoft Visual Studio\Installer\vswhere.exe&quot; -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find VC\Tools\MSVC\*\include\vcruntime.h" ConsoleToMSBuild="true" StandardOutputImportance="low" ContinueOnError="true">
-            <Output TaskParameter="ConsoleOutput" ItemName="_MsvcVcRuntimeHeader" />
-        </Exec>
-        <PropertyGroup>
-            <_MsvcVcRuntimeHeader>%(_MsvcVcRuntimeHeader.Identity)</_MsvcVcRuntimeHeader>
-            <_MsvcToolsDir Condition=" '$(_MsvcVcRuntimeHeader)' != '' ">$([System.IO.Path]::GetDirectoryName($([System.IO.Path]::GetDirectoryName('$(_MsvcVcRuntimeHeader)'))))</_MsvcToolsDir>
-            <_WinSdkDir>$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Kits\Installed Roots', 'KitsRoot10', null, RegistryView.Registry32, RegistryView.Default))</_WinSdkDir>
-        </PropertyGroup>
-        <ItemGroup Condition=" '$(_WinSdkDir)' != '' ">
-            <_WinSdkWindowsH Include="$(_WinSdkDir)Include\*\um\windows.h" />
-        </ItemGroup>
-        <PropertyGroup>
-            <_WinSdkWindowsH>%(_WinSdkWindowsH.FullPath)</_WinSdkWindowsH>
-            <_WinSdkVersion Condition=" '$(_WinSdkWindowsH)' != '' ">$([System.Text.RegularExpressions.Regex]::Match('$(_WinSdkWindowsH)', 'Include\\([^\\]+)\\um').Groups[1].Value)</_WinSdkVersion>
-        </PropertyGroup>
-        <Error Condition=" '$(_MsvcToolsDir)' == '' " Text="Could not locate an MSVC toolset (Visual Studio with the C++ workload). Run from a Visual Studio developer prompt or install the workload." />
-        <Error Condition=" '$(_WinSdkVersion)' == '' " Text="Could not locate a Windows 10/11 SDK under '$(_WinSdkDir)'." />
-        <Message Importance="normal" Text="MSVC toolset: $(_MsvcToolsDir); Windows SDK: $(_WinSdkDir) $(_WinSdkVersion)" />
-        <PropertyGroup>
-            <_WinSdkIncludeDir>$(_WinSdkDir)Include\$(_WinSdkVersion)\</_WinSdkIncludeDir>
-            <_WinSdkLibDir>$(_WinSdkDir)Lib\$(_WinSdkVersion)\</_WinSdkLibDir>
-            <_MsvcLibArch Condition="$(TargetIdentifier.EndsWith('-x64'))">x64</_MsvcLibArch>
-            <_MsvcLibArch Condition="$(TargetIdentifier.EndsWith('-x86'))">x86</_MsvcLibArch>
-            <_MsvcLibArch Condition="$(TargetIdentifier.EndsWith('-arm64'))">arm64</_MsvcLibArch>
-            <!-- MSVC toolset 14.NN maps to compiler version 19.NN; the STL headers gate features on it. -->
-            <_MsvcCompilerVersion>$([System.Text.RegularExpressions.Regex]::Replace($([System.IO.Path]::GetFileName('$(_MsvcToolsDir)')), '^14\.', '19.'))</_MsvcCompilerVersion>
-        </PropertyGroup>
-        <!-- Hand the directories to clang and lld-link the way a developer prompt does: through the
-             INCLUDE and LIB environment variables, which both honor. This avoids passing paths with
-             spaces on the command line (the SDK emits option values verbatim). %3B is ';'. -->
-        <ItemGroup>
-            <AdditionalCompileOptions Include="-fms-compatibility-version" Value="$(_MsvcCompilerVersion)" Separator="=" />
-            <LlvmEnvironmentVariables Include="INCLUDE=$(_MsvcToolsDir)\include%3B$(_WinSdkIncludeDir)ucrt%3B$(_WinSdkIncludeDir)shared%3B$(_WinSdkIncludeDir)um%3B$(_WinSdkIncludeDir)winrt" />
-            <LlvmEnvironmentVariables Include="LIB=$(_MsvcToolsDir)\lib\$(_MsvcLibArch)%3B$(_WinSdkLibDir)ucrt\$(_MsvcLibArch)%3B$(_WinSdkLibDir)um\$(_MsvcLibArch)" />
-        </ItemGroup>
-    </Target>
+    <Import Project="$(MSBuildThisFileDirectory)ClangOSXCodeSign.targets"/>
 
 </Project>

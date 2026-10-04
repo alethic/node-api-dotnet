@@ -1,4 +1,3 @@
-<!-- From https://github.com/ikvmnet/ikvm (MIT): builds referenced IKVM.Clang projects per runtime identifier and adds their outputs under runtimes/<rid>/native (build output, package, and .deps.json). -->
 <Project>
     <PropertyGroup>
         <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
