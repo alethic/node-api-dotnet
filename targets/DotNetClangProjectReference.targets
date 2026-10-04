@@ -4,7 +4,7 @@
 
     From IKVM (IKVM.libs.targets, verbatim target): a .NET project declares
 
-        <DotNetClangProjectReference Include="..\LibNodeShim\LibNodeShim.clangproj" />
+        <DotNetClangProjectReference Include="..\libnodeshim\libnodeshim.clangproj" />
 
     and the native project is built for every enabled runtime identifier as a ClangProjectReference
     (see ClangProjectReference.targets), landing under runtimes/<rid>/native.

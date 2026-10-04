@@ -34,7 +34,7 @@
 
   <!-- The libnode embedding shim (native, built per enabled RID; lands in runtimes/<rid>/native). -->
   <ItemGroup>
-    <DotNetClangProjectReference Include="..\LibNodeShim\LibNodeShim.clangproj" />
+    <DotNetClangProjectReference Include="..\libnodeshim\libnodeshim.clangproj" />
   </ItemGroup>
 
   <Target Name="SetRuntimeConfigValues" BeforeTargets="GenerateBuildRuntimeConfigurationFiles">

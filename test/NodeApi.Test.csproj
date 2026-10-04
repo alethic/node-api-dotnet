@@ -29,10 +29,10 @@
 
   <!--
     libnode for the embedding tests. Until the Alethic.LibNode packages are published, a local build
-    is used via src/LibNodeShim/LibNode.local.props (git-ignored; see LibNode.local.props.example),
+    is used via src/libnodeshim/LibNode.local.props (git-ignored; see LibNode.local.props.example),
     copied flat into the RID-specific output where the loader finds it next to the test assembly.
   -->
-  <Import Project="..\src\LibNodeShim\LibNode.local.props" Condition="Exists('..\src\LibNodeShim\LibNode.local.props')" />
+  <Import Project="..\src\libnodeshim\LibNode.local.props" Condition="Exists('..\src\libnodeshim\LibNode.local.props')" />
   <PropertyGroup>
     <_LibNodeLocalNativeDir Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">$(LibNodeNativeDir_win_x64)</_LibNodeLocalNativeDir>
     <_LibNodeLocalNativeDir Condition=" '$(RuntimeIdentifier)' == 'win-arm64' ">$(LibNodeNativeDir_win_arm64)</_LibNodeLocalNativeDir>
