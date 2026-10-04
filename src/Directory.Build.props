@@ -1,9 +1,12 @@
 <Project>
   <Import Project="../Directory.Build.props" />
 
-  <ItemGroup>
+  <ItemGroup Condition=" '$(UsingIkvmClangSdk)' != 'true' ">
     <PackageReference Include="Nerdbank.GitVersioning" PrivateAssets="all" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All"/>
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- All projects need to be rebuilt if the version changes. -->
     <Content Include="$(MSBuildThisFileDirectory)version.json" Link="version.json">
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
