@@ -1,4 +1,8 @@
 <Project>
+  <!-- Native (IKVM.Clang) project references, built per runtime identifier. -->
+  <Import Project="targets\ClangProjectReference.targets" Condition=" '$(MSBuildProjectExtension)' == '.csproj' " />
+  <Import Project="targets\DotNetClangProjectReference.targets" Condition=" '$(MSBuildProjectExtension)' == '.csproj' " />
+
   <!-- Clean the local cache when building a package so local projects always get the new content. -->
   <Target Name="CleanLocalPackageCache"
     AfterTargets="Pack"

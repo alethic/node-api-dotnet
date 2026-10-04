@@ -1,0 +1,47 @@
+<!--
+
+    DotNetClangProjectReference.targets
+
+    Lets a .NET project reference an IKVM.Clang project once and have it built for every enabled
+    runtime identifier (from https://github.com/ikvmnet/ikvm, MIT):
+
+        <DotNetClangProjectReference Include="..\LibNodeShim\LibNodeShim.clangproj" />
+
+    Each enabled RID becomes a ClangProjectReference (see ClangProjectReference.targets), whose
+    output lands at runtimes/<rid>/native/ in the build output, the package and the .deps.json.
+    Optional SupportedRuntimes metadata restricts a reference to a subset of RIDs.
+
+-->
+
+<Project>
+    <PropertyGroup>
+        <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    </PropertyGroup>
+
+    <Target Name="GetDotNetClangProjectReferencesByRuntime" Inputs="@(DotNetClangProjectReference)" Outputs="%(DotNetClangProjectReference.Identity)\null" BeforeTargets="AssignClangProjectConfiguration" Condition=" '@(DotNetClangProjectReference)' != '' ">
+        <PropertyGroup>
+            <__SupportedRuntimes>%(DotNetClangProjectReference.SupportedRuntimes)</__SupportedRuntimes>
+            <__SupportedRuntimes Condition=" '$(__SupportedRuntimes)' == '' ">$(_SupportedRuntimes)</__SupportedRuntimes>
+        </PropertyGroup>
+        <ItemGroup>
+            <__SupportedRuntimes Include="$(__SupportedRuntimes)" />
+        </ItemGroup>
+        <ItemGroup>
+            <_ReferencedClangProjectReference Remove="@(_ReferencedClangProjectReference)" />
+            <_ReferencedClangProjectReference Include="@(DotNetClangProjectReference)">
+                <RuntimeIdentifier>%(__SupportedRuntimes.Identity)</RuntimeIdentifier>
+            </_ReferencedClangProjectReference>
+            <ClangProjectReference Include="@(_ReferencedClangProjectReference)" Condition="$(_EnabledRuntimes.Contains(';%(RuntimeIdentifier);'))">
+                <RuntimeIdentifier>%(RuntimeIdentifier)</RuntimeIdentifier>
+            </ClangProjectReference>
+        </ItemGroup>
+    </Target>
+
+    <PropertyGroup>
+        <GetClangProjectReferencesDependsOn>
+            $(GetClangProjectReferencesDependsOn);
+            GetDotNetClangProjectReferencesByRuntime;
+        </GetClangProjectReferencesDependsOn>
+    </PropertyGroup>
+
+</Project>

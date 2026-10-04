@@ -1,0 +1,68 @@
+<!--
+
+    lib.props
+
+    Applies at the top of any native (IKVM.Clang) library project in this repo. Adapted from
+    https://github.com/ikvmnet/ikvm (MIT). Cross-compiling for non-host RIDs needs per-RID sysroots
+    (IKVM uses ikvm-native-sdk); until those are wired up, build only the host RID (see
+    EnabledRuntimes in Directory.Build.props).
+
+-->
+
+<Project>
+    <PropertyGroup>
+        <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    </PropertyGroup>
+
+    <!-- Directory.Build.props normally imports this already; native projects built outside the repo tree get it here. -->
+    <Import Project="$(MSBuildThisFileDirectory)runtimes.props" Condition=" '$(_RuntimesPropsImported)' != 'true' " />
+
+    <PropertyGroup>
+        <DebugSymbols>true</DebugSymbols>
+        <!-- A direct build of a native project builds the enabled RIDs; a referencing .NET project sets TargetIdentifier per RID. -->
+        <TargetIdentifiers>$(EnabledRuntimes)</TargetIdentifiers>
+        <TargetTriple Condition=" '$(TargetIdentifier)' == 'win-x64' ">x86_64-pc-windows-msvc</TargetTriple>
+        <TargetTriple Condition=" '$(TargetIdentifier)' == 'win-x86' ">i686-pc-windows-msvc</TargetTriple>
+        <TargetTriple Condition=" '$(TargetIdentifier)' == 'win-arm64' ">aarch64-pc-windows-msvc</TargetTriple>
+        <TargetTriple Condition=" '$(TargetIdentifier)' == 'linux-x64' ">x86_64-unknown-linux-gnu</TargetTriple>
+        <TargetTriple Condition=" '$(TargetIdentifier)' == 'linux-arm64' ">aarch64-unknown-linux-gnu</TargetTriple>
+        <TargetTriple Condition=" '$(TargetIdentifier)' == 'osx-x64' ">x86_64-apple-macosx</TargetTriple>
+        <TargetTriple Condition=" '$(TargetIdentifier)' == 'osx-arm64' ">arm64-apple-macosx</TargetTriple>
+    </PropertyGroup>
+
+    <!-- The same standalone LLVM that libnode is built with. Override ClangToolExe/LlvmArToolExe if it is elsewhere. -->
+    <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+        <LlvmInstallDir Condition=" '$(LlvmInstallDir)' == '' ">$(ProgramFiles)\LLVM\</LlvmInstallDir>
+        <ClangToolExe Condition=" '$(ClangToolExe)' == '' AND Exists('$(LlvmInstallDir)bin\clang.exe') ">$(LlvmInstallDir)bin\clang.exe</ClangToolExe>
+        <LlvmArToolExe Condition=" '$(LlvmArToolExe)' == '' AND Exists('$(LlvmInstallDir)bin\llvm-ar.exe') ">$(LlvmInstallDir)bin\llvm-ar.exe</LlvmArToolExe>
+    </PropertyGroup>
+
+    <!-- Windows: MSVC-compatible, dynamic CRT and STL (/MD), matching libnode's shared build. -->
+    <PropertyGroup Condition="$(TargetIdentifier.StartsWith('win-'))">
+        <MsCompatibility>true</MsCompatibility>
+    </PropertyGroup>
+    <ItemGroup Condition="$(TargetIdentifier.StartsWith('win-'))">
+        <PreprocessorDefinitions Include="WIN32;_WINDOWS;_MT;_DLL;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE" />
+        <AdditionalCompileOptions Include="-fms-extensions" />
+        <AdditionalLinkOptions Include="-Wl,/NODEFAULTLIB:libucrt" />
+        <Dependencies Include="ucrt;vcruntime;msvcrt;msvcprt;kernel32" />
+    </ItemGroup>
+
+    <PropertyGroup Condition="$(TargetIdentifier.StartsWith('linux-'))">
+        <PositionIndependentCode>true</PositionIndependentCode>
+    </PropertyGroup>
+    <ItemGroup Condition="$(TargetIdentifier.StartsWith('linux-'))">
+        <PreprocessorDefinitions Include="LINUX;__linux__" />
+        <Dependencies Include="stdc++;c" />
+        <AdditionalLinkOptions Include="-Wl,-rpath,$ORIGIN" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(TargetIdentifier.StartsWith('osx-'))">
+        <PreprocessorDefinitions Include="MACOSX;MACOS" />
+        <Dependencies Include="c++" />
+        <AdditionalCompileOptions Include="-mmacosx-version-min" Value="11.0" Separator="=" />
+        <AdditionalLinkOptions Include="-mmacosx-version-min" Value="11.0" Separator="=" />
+        <AdditionalLinkOptions Include="-Wl,-rpath,@loader_path%2f." />
+    </ItemGroup>
+
+</Project>

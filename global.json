@@ -3,5 +3,8 @@
     "version": "10.0.303",
     "allowPrerelease": true,
     "rollForward": "latestFeature"
+  },
+  "msbuild-sdks": {
+    "IKVM.Clang.Sdk": "2.0.4"
   }
 }

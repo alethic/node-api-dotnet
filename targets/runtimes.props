@@ -1,0 +1,27 @@
+<!--
+
+    runtimes.props
+
+    Runtime identifiers for native (IKVM.Clang) projects, shared by Directory.Build.props (for .NET
+    projects referencing them) and lib.props (for the native projects themselves).
+
+    SupportedRuntimes is every RID we ship; EnabledRuntimes is what this build actually compiles.
+    Cross-compiling needs per-RID sysroots that are not wired up yet, so the default is the host RID
+    only; CI overrides EnabledRuntimes once sysroots are in place.
+
+-->
+
+<Project>
+    <PropertyGroup>
+        <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+        <_RuntimesPropsImported>true</_RuntimesPropsImported>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <SupportedRuntimes Condition=" '$(SupportedRuntimes)' == '' ">win-x64;win-arm64;linux-x64;linux-arm64;osx-x64;osx-arm64</SupportedRuntimes>
+        <HostRuntimeIdentifier Condition=" '$(HostRuntimeIdentifier)' == '' ">$([System.Runtime.InteropServices.RuntimeInformation]::RuntimeIdentifier)</HostRuntimeIdentifier>
+        <EnabledRuntimes Condition=" '$(EnabledRuntimes)' == '' ">$(HostRuntimeIdentifier)</EnabledRuntimes>
+        <_SupportedRuntimes>;$(SupportedRuntimes);</_SupportedRuntimes>
+        <_EnabledRuntimes>;$(EnabledRuntimes);</_EnabledRuntimes>
+    </PropertyGroup>
+</Project>

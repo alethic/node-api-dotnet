@@ -21,3 +21,6 @@ dist/
 
 # Generated at test time by TestBuilder.WriteCurrentFrameworkGlobalJson (per-runtime SDK pin)
 test/TestCases/**/global.json
+
+# Local overrides for native projects
+*.local.props
