@@ -1,0 +1,28 @@
+<Project>
+    <Import Sdk="IKVM.Clang.Sdk" Project="Sdk.props" />
+    <Import Project="$(MSBuildThisFileDirectory)..\..\targets\lib.props" />
+
+    <!-- Native smoke test for the libnode embedding shim (see shimtest.c). Run with libnode and
+         nodeshim on PATH / beside the executable. -->
+
+    <PropertyGroup>
+        <TargetName>shimtest</TargetName>
+        <OutputType>exe</OutputType>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(TargetIdentifier.StartsWith('win-'))">
+        <Subsystem>console</Subsystem>
+    </PropertyGroup>
+
+    <Import Project="$(MSBuildThisFileDirectory)..\LibNodeShim\LibNode.local.props" Condition="Exists('$(MSBuildThisFileDirectory)..\LibNodeShim\LibNode.local.props')" />
+
+    <ItemGroup>
+        <ProjectReference Include="..\LibNodeShim\LibNodeShim.clangproj">
+            <BuildReference>true</BuildReference>
+        </ProjectReference>
+        <IncludeDirectories Include="$(MSBuildThisFileDirectory)..\LibNodeShim" />
+        <IncludeDirectories Include="$(LibNodeIncludeDir)node" />
+    </ItemGroup>
+
+    <Import Sdk="IKVM.Clang.Sdk" Project="Sdk.targets" />
+    <Import Project="$(MSBuildThisFileDirectory)..\..\targets\lib.targets" />
+</Project>
