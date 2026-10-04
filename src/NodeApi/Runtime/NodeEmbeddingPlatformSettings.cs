@@ -3,24 +3,19 @@
 
 namespace Microsoft.JavaScript.NodeApi.Runtime;
 
-using static NodeEmbedding;
-using static NodejsRuntime;
+using static LibNodeShim;
 
 public class NodeEmbeddingPlatformSettings
 {
+    /// <summary>Path to the libnode shared library, or null to discover it.</summary>
     public string? LibNodePath { get; set; }
-    public NodeEmbeddingPlatformFlags? PlatformFlags { get; set; }
-    public string[]? Args { get; set; }
-    public ConfigurePlatformCallback? ConfigurePlatform { get; set; }
 
-    public unsafe ConfigurePlatformCallback CreateConfigurePlatformCallback()
-        => new((config) =>
-        {
-            if (PlatformFlags != null)
-            {
-                NodeEmbedding.JSRuntime.EmbeddingPlatformConfigSetFlags(config, PlatformFlags.Value)
-                    .ThrowIfFailed();
-            }
-            ConfigurePlatform?.Invoke(config);
-        });
+    /// <summary>Path to the embedding shim shared library (nodeshim), or null to discover it.</summary>
+    public string? LibNodeShimPath { get; set; }
+
+    /// <summary>node::ProcessInitializationFlags passed to InitializeOncePerProcess.</summary>
+    public NodeProcessInitializationFlags? PlatformFlags { get; set; }
+
+    /// <summary>Process arguments, starting with the program name. Defaults to ["node"].</summary>
+    public string[]? Args { get; set; }
 }

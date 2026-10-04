@@ -3,115 +3,39 @@
 
 namespace Microsoft.JavaScript.NodeApi.Runtime;
 
-using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using static LibNodeShim;
 using static NodeEmbedding;
-using static NodejsRuntime;
 
 public class NodeEmbeddingRuntimeSettings
 {
+    /// <summary>Node-API version for the environment's napi_env. Defaults to
+    /// <see cref="NodeEmbedding.NodeApiVersion"/>.</summary>
     public int? NodeApiVersion { get; set; }
-    public NodeEmbeddingRuntimeFlags? RuntimeFlags { get; set; }
+
+    /// <summary>node::EnvironmentFlags for the environment. Defaults to DefaultFlags.</summary>
+    public NodeEnvironmentFlags? RuntimeFlags { get; set; }
+
+    /// <summary>Script arguments for the environment. Defaults to the platform's parsed args.</summary>
     public string[]? Args { get; set; }
+
+    /// <summary>Node.js (exec) arguments for the environment. Defaults to the platform's parsed
+    /// exec args.</summary>
     public string[]? RuntimeArgs { get; set; }
+
+    /// <summary>Runs before the entry point in the main environment and in every worker thread.</summary>
     public PreloadCallback? OnPreload { get; set; }
+
+    /// <summary>CommonJS source to run as the entry point (not a path). Mutually exclusive with
+    /// <see cref="OnLoading"/>.</summary>
     public string? MainScript { get; set; }
+
+    /// <summary>Custom entry point: receives process, require and the run-CommonJS function.</summary>
     public LoadingCallback? OnLoading { get; set; }
+
+    /// <summary>Receives the entry point's result after the environment is loaded.</summary>
     public LoadedCallback? OnLoaded { get; set; }
+
+    /// <summary>Linked modules, available to scripts through process._linkedBinding(name).</summary>
     public IEnumerable<NodeEmbeddingModuleInfo>? Modules { get; set; }
-    public PostTaskCallback? OnPostTask { get; set; }
-    public ConfigureRuntimeCallback? ConfigureRuntime { get; set; }
-
-    public unsafe ConfigureRuntimeCallback CreateConfigureRuntimeCallback()
-        => new((platform, config) =>
-        {
-            if (NodeApiVersion != null)
-            {
-                NodeEmbedding.JSRuntime.EmbeddingRuntimeConfigSetNodeApiVersion(
-                    config, NodeApiVersion.Value)
-                    .ThrowIfFailed();
-            }
-            if (RuntimeFlags != null)
-            {
-                NodeEmbedding.JSRuntime.EmbeddingRuntimeConfigSetFlags(config, RuntimeFlags.Value)
-                    .ThrowIfFailed();
-            }
-            if (Args != null || RuntimeArgs != null)
-            {
-                NodeEmbedding.JSRuntime.EmbeddingRuntimeConfigSetArgs(config, Args, RuntimeArgs)
-                    .ThrowIfFailed();
-            }
-
-            if (OnPreload != null)
-            {
-                Functor<node_embedding_runtime_preload_callback> functor =
-                    CreateRuntimePreloadFunctor(OnPreload);
-                NodeEmbedding.JSRuntime.EmbeddingRuntimeConfigOnPreload(
-                    config, functor.Callback, functor.Data, functor.DataRelease)
-                    .ThrowIfFailed();
-            }
-
-            if (MainScript != null)
-            {
-                JSValue onLoading(NodeEmbeddingRuntime runtime,
-                                  JSValue process,
-                                  JSValue require,
-                                  JSValue runCommonJS)
-                    => runCommonJS.Call(JSValue.Null, (JSValue)MainScript);
-
-                Functor<node_embedding_runtime_loading_callback> functor =
-                    CreateRuntimeLoadingFunctor(onLoading);
-                NodeEmbedding.JSRuntime.EmbeddingRuntimeConfigOnLoading(
-                    config, functor.Callback, functor.Data, functor.DataRelease)
-                    .ThrowIfFailed();
-            }
-            else if (OnLoading != null)
-            {
-                Functor<node_embedding_runtime_loading_callback> functor =
-                    CreateRuntimeLoadingFunctor(OnLoading);
-                NodeEmbedding.JSRuntime.EmbeddingRuntimeConfigOnLoading(
-                    config, functor.Callback, functor.Data, functor.DataRelease)
-                    .ThrowIfFailed();
-            }
-
-            if (OnLoaded != null)
-            {
-                Functor<node_embedding_runtime_loaded_callback> functor =
-                    CreateRuntimeLoadedFunctor(OnLoaded);
-                NodeEmbedding.JSRuntime.EmbeddingRuntimeConfigOnLoaded(
-                    config, functor.Callback, functor.Data, functor.DataRelease)
-                    .ThrowIfFailed();
-            }
-
-            if (Modules != null)
-            {
-                foreach (NodeEmbeddingModuleInfo module in Modules)
-                {
-                    Functor<node_embedding_module_initialize_callback> functor =
-                        CreateModuleInitializeFunctor(module.OnInitialize);
-                    NodeEmbedding.JSRuntime.EmbeddingRuntimeConfigAddModule(
-                        config,
-                        module.Name.AsSpan(),
-                        functor.Callback,
-                        functor.Data,
-                        functor.DataRelease,
-                        module.NodeApiVersion ?? 0)
-                        .ThrowIfFailed();
-                }
-            }
-
-            if (OnPostTask != null)
-            {
-                Functor<node_embedding_task_post_callback> functor =
-                    CreateTaskPostFunctor(OnPostTask);
-                NodeEmbedding.JSRuntime.EmbeddingRuntimeConfigSetTaskRunner(
-                    config,
-                    new node_embedding_task_post_callback(s_taskPostCallback),
-                    (nint)GCHandle.Alloc(OnPostTask),
-                    new node_embedding_data_release_callback(s_releaseDataCallback))
-                    .ThrowIfFailed();
-            }
-            ConfigureRuntime?.Invoke(platform, config);
-        });
 }

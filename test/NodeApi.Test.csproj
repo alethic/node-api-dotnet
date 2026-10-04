@@ -27,8 +27,27 @@
     <Compile Condition="'$(TargetFramework)' != '$(AotTargetFramework)'" Remove="NativeAotTests.cs" />
   </ItemGroup>
 
+  <!--
+    libnode for the embedding tests. Until the Alethic.LibNode packages are published, a local build
+    is used via src/LibNodeShim/LibNode.local.props (git-ignored; see LibNode.local.props.example),
+    copied flat into the RID-specific output where the loader finds it next to the test assembly.
+  -->
+  <Import Project="..\src\LibNodeShim\LibNode.local.props" Condition="Exists('..\src\LibNodeShim\LibNode.local.props')" />
+  <PropertyGroup>
+    <_LibNodeLocalNativeDir Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">$(LibNodeNativeDir_win_x64)</_LibNodeLocalNativeDir>
+    <_LibNodeLocalNativeDir Condition=" '$(RuntimeIdentifier)' == 'win-arm64' ">$(LibNodeNativeDir_win_arm64)</_LibNodeLocalNativeDir>
+    <_LibNodeLocalNativeDir Condition=" '$(RuntimeIdentifier)' == 'linux-x64' ">$(LibNodeNativeDir_linux_x64)</_LibNodeLocalNativeDir>
+    <_LibNodeLocalNativeDir Condition=" '$(RuntimeIdentifier)' == 'linux-arm64' ">$(LibNodeNativeDir_linux_arm64)</_LibNodeLocalNativeDir>
+    <_LibNodeLocalNativeDir Condition=" '$(RuntimeIdentifier)' == 'osx-x64' ">$(LibNodeNativeDir_osx_x64)</_LibNodeLocalNativeDir>
+    <_LibNodeLocalNativeDir Condition=" '$(RuntimeIdentifier)' == 'osx-arm64' ">$(LibNodeNativeDir_osx_arm64)</_LibNodeLocalNativeDir>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(_LibNodeLocalNativeDir)' != '' ">
+    <None Include="$(_LibNodeLocalNativeDir)libnode.dll" Condition="Exists('$(_LibNodeLocalNativeDir)libnode.dll')" Link="libnode.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+    <None Include="$(_LibNodeLocalNativeDir)libnode.so" Condition="Exists('$(_LibNodeLocalNativeDir)libnode.so')" Link="libnode.so" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+    <None Include="$(_LibNodeLocalNativeDir)libnode.dylib" Condition="Exists('$(_LibNodeLocalNativeDir)libnode.dylib')" Link="libnode.dylib" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+  </ItemGroup>
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.JavaScript.LibNode" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />

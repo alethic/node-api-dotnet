@@ -386,13 +386,43 @@ uv_loop_t* NODESHIM_CDECL node_get_current_event_loop(v8_isolate isolate) {
   return node::GetCurrentEventLoop(Isolate(isolate));
 }
 
-void NODESHIM_CDECL node_add_linked_binding_napi(
-    node_environment env, const char* name, napi_addon_register_func init, int32_t module_api_version) {
-  // node_module keeps the name pointer for the life of the environment; it is intentionally never freed.
+namespace {
+
+// node_module keeps the name pointer for the life of the environment; copies are intentionally never freed.
+const char* CopyBindingName(const char* name) {
   size_t length = std::strlen(name) + 1;
   char* copy = new char[length];
   std::memcpy(copy, name, length);
-  node::AddLinkedBinding(Env(env), copy, init, module_api_version);
+  return copy;
+}
+
+// Trampoline from node::addon_context_register_func (v8 locals) to the C callback; priv carries
+// both the C callback and its own priv.
+struct LinkedBindingThunk {
+  node_addon_context_register_func fn;
+  void* priv;
+};
+
+void LinkedBindingTrampoline(v8::Local<v8::Object> exports,
+                             v8::Local<v8::Value> module,
+                             v8::Local<v8::Context> context,
+                             void* priv) {
+  auto* thunk = static_cast<LinkedBindingThunk*>(priv);
+  thunk->fn(ToLocal(exports), ToLocal(module), ToLocal(context), thunk->priv);
+}
+
+}  // namespace
+
+void NODESHIM_CDECL node_add_linked_binding_napi(
+    node_environment env, const char* name, napi_addon_register_func init, int32_t module_api_version) {
+  node::AddLinkedBinding(Env(env), CopyBindingName(name), init, module_api_version);
+}
+
+void NODESHIM_CDECL node_add_linked_binding(
+    node_environment env, const char* name, node_addon_context_register_func fn, void* priv) {
+  // The thunk lives as long as the binding registration (the environment); never freed, like the name.
+  auto* thunk = new LinkedBindingThunk{fn, priv};
+  node::AddLinkedBinding(Env(env), CopyBindingName(name), LinkedBindingTrampoline, thunk);
 }
 
 void NODESHIM_CDECL node_add_environment_cleanup_hook(v8_isolate isolate, node_cleanup_hook_callback fun, void* arg) {
@@ -406,6 +436,10 @@ void NODESHIM_CDECL node_remove_environment_cleanup_hook(v8_isolate isolate, nod
 // ---------------------------------------------------------------------------------------------
 // V8 scopes
 // ---------------------------------------------------------------------------------------------
+
+v8_isolate NODESHIM_CDECL v8_isolate_get_current(void) {
+  return ToIsolate(v8::Isolate::GetCurrent());
+}
 
 v8_locker NODESHIM_CDECL v8_locker_new(v8_isolate isolate) {
   return new v8_locker_s(Isolate(isolate));

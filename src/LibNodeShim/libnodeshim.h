@@ -250,12 +250,29 @@ NODESHIM_API node_environment NODESHIM_CDECL node_get_current_environment(v8_loc
 NODESHIM_API uv_loop_t* NODESHIM_CDECL node_get_current_event_loop(v8_isolate isolate);
 
 // node::AddLinkedBinding(env, name, napi_addon_register_func, module_api_version).
-// Makes process._linkedBinding(name) available; name is copied.
+// Makes process._linkedBinding(name) available; name is copied. Node creates a napi_env for the
+// binding and passes it to init.
 NODESHIM_API void NODESHIM_CDECL node_add_linked_binding_napi(
     node_environment env,
     const char* name,
     napi_addon_register_func init,
     int32_t module_api_version);
+
+// node::addon_context_register_func: the non-Node-API linked binding entry point. exports, module
+// and context are v8 locals (exports/module usable as napi_value given a napi_env for the
+// environment); priv is the pointer given to node_add_linked_binding.
+typedef void(NODESHIM_CDECL* node_addon_context_register_func)(
+    v8_local exports,
+    v8_local module,
+    v8_local context,
+    void* priv);
+
+// node::AddLinkedBinding(env, name, addon_context_register_func, priv). Name is copied.
+NODESHIM_API void NODESHIM_CDECL node_add_linked_binding(
+    node_environment env,
+    const char* name,
+    node_addon_context_register_func fn,
+    void* priv);
 
 // node::AddEnvironmentCleanupHook / RemoveEnvironmentCleanupHook
 NODESHIM_API void NODESHIM_CDECL node_add_environment_cleanup_hook(v8_isolate isolate, node_cleanup_hook_callback fun, void* arg);
@@ -264,6 +281,9 @@ NODESHIM_API void NODESHIM_CDECL node_remove_environment_cleanup_hook(v8_isolate
 // ---------------------------------------------------------------------------------------------
 // V8 scopes (v8.h: Locker, Isolate::Scope, HandleScope, Context::Scope)
 // ---------------------------------------------------------------------------------------------
+
+// v8::Isolate::GetCurrent(): the isolate entered on the current thread (e.g. in a worker's preload).
+NODESHIM_API v8_isolate NODESHIM_CDECL v8_isolate_get_current(void);
 
 NODESHIM_API v8_locker NODESHIM_CDECL v8_locker_new(v8_isolate isolate);
 NODESHIM_API void NODESHIM_CDECL v8_locker_delete(v8_locker locker);

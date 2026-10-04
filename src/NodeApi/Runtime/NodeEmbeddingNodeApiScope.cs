@@ -4,23 +4,25 @@
 namespace Microsoft.JavaScript.NodeApi.Runtime;
 
 using System;
-using static JSRuntime;
-using static NodejsRuntime;
 
+/// <summary>
+/// Enters everything needed to call Node-API for an embedded environment from the current thread:
+/// the V8 locker, isolate scope, handle scope and context scope, and a root
+/// <see cref="JSValueScope"/> for the environment's napi_env.
+/// </summary>
 public sealed class NodeEmbeddingNodeApiScope : IDisposable
 {
-    readonly NodeEmbeddingRuntime _runtime;
-    private node_embedding_node_api_scope _nodeApiScope;
+    private readonly NodeEmbeddingRuntime _runtime;
+    private readonly NodeEmbeddingRuntime.V8Scopes _v8Scopes;
     private readonly JSValueScope _valueScope;
 
     public NodeEmbeddingNodeApiScope(NodeEmbeddingRuntime runtime)
     {
         _runtime = runtime;
-        NodeEmbedding.JSRuntime.EmbeddingRuntimeOpenNodeApiScope(
-            runtime.Handle, out _nodeApiScope, out napi_env env)
-            .ThrowIfFailed();
+        _v8Scopes = runtime.EnterV8Scopes();
         _valueScope = new JSValueScope(
-            JSValueScopeType.Root, env, NodeEmbedding.JSRuntime);
+            JSValueScopeType.Root, runtime.Env, NodeEmbedding.JSRuntime);
+        runtime.ScopeDepth++;
     }
 
     /// <summary>
@@ -36,9 +38,8 @@ public sealed class NodeEmbeddingNodeApiScope : IDisposable
         if (IsDisposed) return;
         IsDisposed = true;
 
+        _runtime.ScopeDepth--;
         _valueScope.Dispose();
-        NodeEmbedding.JSRuntime.EmbeddingRuntimeCloseNodeApiScope(
-            _runtime.Handle, _nodeApiScope)
-            .ThrowIfFailed();
+        NodeEmbeddingRuntime.ExitV8Scopes(_v8Scopes);
     }
 }

@@ -32,6 +32,11 @@
     <InternalsVisibleTo Include="Microsoft.JavaScript.NodeApi.Test" />
   </ItemGroup>
 
+  <!-- The libnode embedding shim (native, built per enabled RID; lands in runtimes/<rid>/native). -->
+  <ItemGroup>
+    <DotNetClangProjectReference Include="..\LibNodeShim\LibNodeShim.clangproj" />
+  </ItemGroup>
+
   <Target Name="SetRuntimeConfigValues" BeforeTargets="GenerateBuildRuntimeConfigurationFiles">
     <ItemGroup>
       <RuntimeHostConfigurationOption Include="System.Runtime.InteropServices.EnableConsumingManagedCodeFromNativeHosting" Value="true" />
