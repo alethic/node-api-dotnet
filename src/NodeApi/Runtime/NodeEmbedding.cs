@@ -146,14 +146,23 @@ public static class NodeEmbedding
                 "The JSRuntime can be initialized only once per process.");
         }
 
-        // libnode first: the shim links against it, so it must already be loaded (or loadable
-        // beside the shim) when the shim is loaded.
-        nint libnodeHandle = libNodePath is null
-            ? LoadDefaultLibrary("libnode", null)
-            : NativeLibrary.Load(libNodePath);
+        // On Windows libnode is loaded first, by name, and satisfies the shim's import of libnode.dll.
+        // On Linux and macOS libnode has a versioned file name (libnode.so.147, libnode.147.dylib),
+        // which the shim records and finds beside itself through its rpath: loading the shim loads
+        // libnode, and libnode's exports resolve through the shim's handle, because dlsym also
+        // searches the libraries that the handle's library depends on.
+        nint libnodeHandle = libNodePath is not null
+            ? NativeLibrary.Load(libNodePath)
+            : RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? LoadDefaultLibrary("libnode", null)
+                : default;
         nint shimHandle = libNodeShimPath is null
             ? LoadDefaultLibrary("node-dotnet", libNodePath)
             : NativeLibrary.Load(libNodeShimPath);
+        if (libnodeHandle == default)
+        {
+            libnodeHandle = shimHandle;
+        }
 
         LibNodeShim.Initialize(libnodeHandle, shimHandle);
         s_jsRuntime = new NodejsRuntime(libnodeHandle);
