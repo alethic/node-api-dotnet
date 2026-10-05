@@ -4,7 +4,7 @@
 namespace Microsoft.JavaScript.NodeApi.Runtime;
 
 using System.Collections.Generic;
-using static LibNodeShim;
+using static NodeDotNet;
 using static NodeEmbedding;
 
 public class NodeEmbeddingRuntimeSettings

@@ -4,7 +4,7 @@
 namespace Microsoft.JavaScript.NodeApi.Runtime;
 
 using System;
-using static LibNodeShim;
+using static NodeDotNet;
 
 /// <summary>
 /// Manages the per-process Node.js platform (node::InitializeOncePerProcess), provided by libnode.
@@ -33,7 +33,7 @@ public sealed class NodeEmbeddingPlatform : IDisposable
                 "Only one Node.js platform instance per process is allowed.");
         }
         Current = this;
-        NodeEmbedding.Initialize(settings?.LibNodePath, settings?.LibNodeShimPath);
+        NodeEmbedding.Initialize(settings?.LibNodePath, settings?.NodeDotNetPath);
 
         string[] args = settings?.Args ?? new string[] { "node" };
         NodeProcessInitializationFlags flags =

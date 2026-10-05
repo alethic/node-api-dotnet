@@ -17,7 +17,7 @@ using static JSRuntime;
 /// Every function here corresponds to one declaration in node-dotnet.h. A <c>v8_local</c> has the
 /// same representation as <see cref="napi_value"/> and is typed as such.
 /// </remarks>
-public static unsafe class LibNodeShim
+public static unsafe class NodeDotNet
 {
     /// <summary>Name of the linked binding used to obtain a napi_env for an environment.</summary>
     public const string BootstrapBindingName = "node_api_dotnet_embedding";
@@ -103,7 +103,7 @@ public static unsafe class LibNodeShim
     {
         if (s_shimHandle != default)
         {
-            throw new InvalidOperationException("The libnode shim is already initialized.");
+            throw new InvalidOperationException("node-dotnet is already initialized.");
         }
         s_libnodeHandle = libnodeHandle;
         s_shimHandle = shimHandle;

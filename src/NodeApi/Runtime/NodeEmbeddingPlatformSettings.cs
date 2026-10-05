@@ -3,7 +3,7 @@
 
 namespace Microsoft.JavaScript.NodeApi.Runtime;
 
-using static LibNodeShim;
+using static NodeDotNet;
 
 public class NodeEmbeddingPlatformSettings
 {
@@ -11,7 +11,7 @@ public class NodeEmbeddingPlatformSettings
     public string? LibNodePath { get; set; }
 
     /// <summary>Path to the embedding shim shared library (node-dotnet), or null to discover it.</summary>
-    public string? LibNodeShimPath { get; set; }
+    public string? NodeDotNetPath { get; set; }
 
     /// <summary>node::ProcessInitializationFlags passed to InitializeOncePerProcess.</summary>
     public NodeProcessInitializationFlags? PlatformFlags { get; set; }

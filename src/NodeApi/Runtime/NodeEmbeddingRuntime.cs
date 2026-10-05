@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using static JSRuntime;
-using static LibNodeShim;
+using static NodeDotNet;
 using static NodeEmbedding;
 
 /// <summary>

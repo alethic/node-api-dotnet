@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 using static JSRuntime;
-using static LibNodeShim;
+using static NodeDotNet;
 
 /// <summary>
 /// Shared code for the Node.js embedding classes: loading libnode and the embedding shim, the
@@ -136,9 +136,9 @@ public static class NodeEmbedding
     /// <see cref="NodeEmbeddingPlatform"/>.
     /// </summary>
     /// <param name="libNodePath">Path to the libnode shared library, or null to discover it.</param>
-    /// <param name="libNodeShimPath">Path to the embedding shim shared library (node-dotnet), or null
+    /// <param name="nodeDotNetPath">Path to the embedding shim shared library (node-dotnet), or null
     /// to discover it (beside libnode when its path is known, else like libnode).</param>
-    public static void Initialize(string? libNodePath, string? libNodeShimPath = null)
+    public static void Initialize(string? libNodePath, string? nodeDotNetPath = null)
     {
         if (s_jsRuntime != null)
         {
@@ -156,15 +156,15 @@ public static class NodeEmbedding
             : RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? LoadDefaultLibrary("libnode", null)
                 : default;
-        nint shimHandle = libNodeShimPath is null
+        nint shimHandle = nodeDotNetPath is null
             ? LoadDefaultLibrary("node-dotnet", libNodePath)
-            : NativeLibrary.Load(libNodeShimPath);
+            : NativeLibrary.Load(nodeDotNetPath);
         if (libnodeHandle == default)
         {
             libnodeHandle = shimHandle;
         }
 
-        LibNodeShim.Initialize(libnodeHandle, shimHandle);
+        NodeDotNet.Initialize(libnodeHandle, shimHandle);
         s_jsRuntime = new NodejsRuntime(libnodeHandle);
     }
 
@@ -228,7 +228,7 @@ public static class NodeEmbedding
     }
 
     //==============================================================================================
-    // Native-to-managed callback adapters (see LibNodeShim.*Pointer)
+    // Native-to-managed callback adapters (see NodeDotNet.*Pointer)
     //==============================================================================================
 
 #if UNMANAGED_DELEGATES
