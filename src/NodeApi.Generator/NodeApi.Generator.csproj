@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <AssemblyName>Microsoft.JavaScript.NodeApi.Generator</AssemblyName>
+    <PackageId>Alethic.NodeApi.Generator</PackageId>
     <RootNamespace>Microsoft.JavaScript.NodeApi.Generator</RootNamespace>
     <OutputType>Exe</OutputType>
     <IsPackable>true</IsPackable>
@@ -21,8 +22,8 @@
     <None Pack="true" PackagePath="\" Include="..\..\README.md" />
 
     <!-- Pack MSBuild props and targets files that configure and invoke the generator. -->
-    <None Pack="true" PackagePath="build\$(AssemblyName).props" Include="NodeApi.Generator.props" />
-    <None Pack="true" PackagePath="build\$(AssemblyName).targets" Include="NodeApi.Generator.targets" />
+    <None Pack="true" PackagePath="build\$(PackageId).props" Include="NodeApi.Generator.props" />
+    <None Pack="true" PackagePath="build\$(PackageId).targets" Include="NodeApi.Generator.targets" />
   </ItemGroup>
 
   <!--

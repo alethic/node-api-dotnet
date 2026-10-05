@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <AssemblyName>Microsoft.JavaScript.NodeApi.DotNetHost</AssemblyName>
+    <PackageId>Alethic.NodeApi.DotNetHost</PackageId>
     <RootNamespace>Microsoft.JavaScript.NodeApi.DotNetHost</RootNamespace>
     <IsPackable>true</IsPackable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

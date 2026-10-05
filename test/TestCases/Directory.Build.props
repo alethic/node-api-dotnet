@@ -43,8 +43,8 @@
       <RestorePackagesPath>$(MSBuildThisFileDirectory)../../out/pkg</RestorePackagesPath>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.JavaScript.NodeApi" VersionOverride="$(NodeApiDotnetPackageVersion)" />
-        <PackageReference Include="Microsoft.JavaScript.NodeApi.DotNetHost" PrivateAssets="All" VersionOverride="$(NodeApiDotnetPackageVersion)" />
-        <PackageReference Include="Microsoft.JavaScript.NodeApi.Generator" VersionOverride="$(NodeApiDotnetPackageVersion)" />
+        <PackageReference Include="Alethic.NodeApi" VersionOverride="$(NodeApiDotnetPackageVersion)" />
+        <PackageReference Include="Alethic.NodeApi.DotNetHost" PrivateAssets="All" VersionOverride="$(NodeApiDotnetPackageVersion)" />
+        <PackageReference Include="Alethic.NodeApi.Generator" VersionOverride="$(NodeApiDotnetPackageVersion)" />
     </ItemGroup>
   </Project>

@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <AssemblyName>Microsoft.JavaScript.NodeApi</AssemblyName>
+    <PackageId>Alethic.NodeApi</PackageId>
     <RootNamespace>Microsoft.JavaScript.NodeApi</RootNamespace>
     <IsPackable>true</IsPackable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -56,7 +57,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Pack="true" PackagePath="build\$(AssemblyName).targets" Include="NodeApi.targets" />
+    <None Pack="true" PackagePath="build\$(PackageId).targets" Include="NodeApi.targets" />
     <None Pack="true" PackagePath="\" Include="..\..\README.md" />
   </ItemGroup>
 

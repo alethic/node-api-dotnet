@@ -5,6 +5,8 @@ name: PR Verification
 on:
   pull_request:
     branches: [ "main" ]
+  push:
+    branches: [ "libnode" ]
   workflow_dispatch: # Enable manually starting a build
 
 jobs:
@@ -65,9 +67,10 @@ jobs:
     - name: Add NuGet Source Credentials (GitHub)
       run: dotnet nuget update source alethic --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
 
-    - name: Build packages
-      id: pack
-      run: dotnet pack --configuration ${{ matrix.configuration }}
+    # Only the hosting side (.NET hosting Node.js through Alethic.LibNode) is built and tested.
+    - name: Build
+      id: build
+      run: dotnet build test/NodeApi.Test.csproj --configuration ${{ matrix.configuration }}
 
     # Uncomment to enable an SSH session for debugging
     # - name: Setup tmate session
@@ -75,22 +78,15 @@ jobs:
     #  with:
     #      limit-access-to-actor: true
 
-    - name: Upload build artifacts
-      if: matrix.dotnet-version == 'net10.0' && matrix.node-version == '22.x'
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-      with:
-        name: ${{ matrix.os }}-${{ matrix.configuration }}-packages
-        path: |
-          out/pkg/*.*nupkg
-          out/pkg/*.tgz
-
     - name: Test
-      if: steps.pack.conclusion == 'success' && !cancelled()
+      if: steps.build.conclusion == 'success' && !cancelled()
       env:
         TRACE_NODE_API_HOST: 1
       run: >
-        dotnet test -f ${{ matrix.dotnet-version }}
+        dotnet test test/NodeApi.Test.csproj -f ${{ matrix.dotnet-version }}
         --configuration ${{ matrix.configuration }}
+        --no-build
+        --filter "FullyQualifiedName~NodejsEmbeddingTests|FullyQualifiedName~GCTests"
         --logger trx
         --results-directory "out/test/${{matrix.dotnet-version}}-node${{matrix.node-version}}-${{matrix.configuration}}"
       continue-on-error: true

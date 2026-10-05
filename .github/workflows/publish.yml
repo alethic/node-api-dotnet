@@ -1,0 +1,41 @@
+name: Publish
+
+# Packs Alethic.NodeApi (the hosting API: .NET hosting Node.js through Alethic.LibNode) and pushes it
+# to the alethic GitHub Packages NuGet registry. Versions come from Nerdbank.GitVersioning.
+
+on:
+  push:
+    branches: [ "libnode" ]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: windows-latest # the net472 build is Windows-only
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      with:
+        fetch-depth: 0 # Deep clone is required for versioning on git commit height
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+      with:
+        dotnet-version: |
+          8.0.x
+          9.0.x
+          10.0.x
+
+    - name: Pack
+      run: dotnet pack src/NodeApi/NodeApi.csproj --configuration Release
+
+    - name: Push to GitHub Packages
+      run: dotnet nuget push "out/pkg/Alethic.NodeApi.*.nupkg" --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      with:
+        name: packages
+        path: out/pkg/*.*nupkg

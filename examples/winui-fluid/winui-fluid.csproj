@@ -46,8 +46,8 @@
 
   <ItemGroup>
     <PackageReference Include="Alethic.LibNode" Version="$(LibNodePackageVersion)" />
-    <PackageReference Include="Microsoft.JavaScript.NodeApi" Version="$(NodeApiDotnetPackageVersion)" />
-    <PackageReference Include="Microsoft.JavaScript.NodeApi.DotNetHost" Version="$(NodeApiDotnetPackageVersion)" />
+    <PackageReference Include="Alethic.NodeApi" Version="$(NodeApiDotnetPackageVersion)" />
+    <PackageReference Include="Alethic.NodeApi.DotNetHost" Version="$(NodeApiDotnetPackageVersion)" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.*" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
     <Manifest Include="$(ApplicationManifest)" />
