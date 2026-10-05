@@ -6,17 +6,15 @@ should be.
 :::
 
 ## Acquiring the the required `libnode` binary
-This project depends on a [PR to Node.js](https://github.com/nodejs/node/pull/54660) that adds
-simpler ABI-stable embedding APIs to `libnode`. Until that PR is merged and the Node.js project
-starts building shared `libnode`, we offer the
-[`Microsoft.JavaScript.LibNode](https://www.nuget.org/packages/Microsoft.JavaScript.LibNode) NuGet
-package that installs pre-built `libnode` for Windows, MacOSX, and Linux (Ubuntu). This package
-depends on the runtime ID specific NuGet packages which can be used directly if needed.
+Hosting Node.js from .NET needs a shared `libnode` and `node-dotnet`, a small C shim over Node's
+C++ embedding API built against that exact `libnode`. Both come from the `Alethic.LibNode` NuGet
+package ([alethic/libnode-dotnet](https://github.com/alethic/libnode-dotnet)), which builds
+unpatched Node.js for Windows, macOS and Linux. It depends on the runtime ID specific
+`Alethic.LibNode.runtime.<rid>` packages, which can be used directly if needed.
 
-Since the PR for the ABI-stable embedding API is still work in progress, the built `libnode`
-will have breaking changes between versions. See the `Directory.Packages.props` file in the
-root of the `node-api-dotnet` project for the matching version of the `Microsoft.JavaScript.LibNode`
-package.
+The package is published to the alethic GitHub Packages feed, which requires authentication even
+to read. See the `Directory.Packages.props` file in the root of the `node-api-dotnet` project for
+the matching version of the `Alethic.LibNode` package.
 
 ## Importing JS modules into .NET
 

@@ -1,9 +1,4 @@
 <Project>
-  <!-- Native (IKVM.Clang) project references, built per runtime identifier (from IKVM). -->
-  <Import Project="targets\ClangProjectReference.targets" />
-  <Import Project="targets\DotNetClangProjectReference.targets" />
-  <Import Project="targets\DotNetOSXCodeSign.targets" />
-
   <!-- Clean the local cache when building a package so local projects always get the new content. -->
   <Target Name="CleanLocalPackageCache"
     AfterTargets="Pack"
@@ -21,7 +16,7 @@
     BeforeTargets="Pack"
   >
     <PropertyGroup>
-      <LibNodePackageVersion Condition="'%(PackageVersion.Identity)' == 'Microsoft.JavaScript.LibNode'">%(PackageVersion.Version)</LibNodePackageVersion>
+      <LibNodePackageVersion Condition="'%(PackageVersion.Identity)' == 'Alethic.LibNode'">%(PackageVersion.Version)</LibNodePackageVersion>
     </PropertyGroup>
     <WriteLinesToFile
       File="$(PackageOutputPath)version.props"

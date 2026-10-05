@@ -9,12 +9,12 @@ using System.Runtime.InteropServices;
 using static JSRuntime;
 
 /// <summary>
-/// P/Invoke surface of the libnode embedding shim (src/LibNodeShim/libnodeshim.h), a C ABI that
+/// P/Invoke surface of the libnode embedding shim, node-dotnet (node-dotnet.h in alethic/libnode-dotnet), a C ABI that
 /// mirrors Node.js's C++ embedding API (node.h) and the v8.h scopes an embedder needs, plus the
 /// two libuv functions used to drive the event loop manually (exported by libnode itself).
 /// </summary>
 /// <remarks>
-/// Every function here corresponds to one declaration in libnodeshim.h. A <c>v8_local</c> has the
+/// Every function here corresponds to one declaration in node-dotnet.h. A <c>v8_local</c> has the
 /// same representation as <see cref="napi_value"/> and is typed as such.
 /// </remarks>
 public static unsafe class LibNodeShim

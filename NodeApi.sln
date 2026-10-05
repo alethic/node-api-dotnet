@@ -31,8 +31,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NodeApi.DotNetHost", "src\N
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeApi.Bench", "bench\NodeApi.Bench.csproj", "{9EC2AB75-6B03-4E83-8A5D-8660B40B0A9C}"
 EndProject
-Project("{C16F8DA6-AF2B-48DF-A3C0-8B93BDB1BB12}") = "libnodeshim", "src\libnodeshim\libnodeshim.clangproj", "{6E1D3B52-8A4F-4C1E-9B7D-2F5A0C9E4D31}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,10 +57,6 @@ Global
 		{9EC2AB75-6B03-4E83-8A5D-8660B40B0A9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EC2AB75-6B03-4E83-8A5D-8660B40B0A9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EC2AB75-6B03-4E83-8A5D-8660B40B0A9C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6E1D3B52-8A4F-4C1E-9B7D-2F5A0C9E4D31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6E1D3B52-8A4F-4C1E-9B7D-2F5A0C9E4D31}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6E1D3B52-8A4F-4C1E-9B7D-2F5A0C9E4D31}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6E1D3B52-8A4F-4C1E-9B7D-2F5A0C9E4D31}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

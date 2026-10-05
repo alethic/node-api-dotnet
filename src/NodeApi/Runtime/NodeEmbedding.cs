@@ -136,7 +136,7 @@ public static class NodeEmbedding
     /// <see cref="NodeEmbeddingPlatform"/>.
     /// </summary>
     /// <param name="libNodePath">Path to the libnode shared library, or null to discover it.</param>
-    /// <param name="libNodeShimPath">Path to the embedding shim shared library (nodeshim), or null
+    /// <param name="libNodeShimPath">Path to the embedding shim shared library (node-dotnet), or null
     /// to discover it (beside libnode when its path is known, else like libnode).</param>
     public static void Initialize(string? libNodePath, string? libNodeShimPath = null)
     {
@@ -152,7 +152,7 @@ public static class NodeEmbedding
             ? LoadDefaultLibrary("libnode", null)
             : NativeLibrary.Load(libNodePath);
         nint shimHandle = libNodeShimPath is null
-            ? LoadDefaultLibrary("nodeshim", libNodePath)
+            ? LoadDefaultLibrary("node-dotnet", libNodePath)
             : NativeLibrary.Load(libNodeShimPath);
 
         LibNodeShim.Initialize(libnodeHandle, shimHandle);

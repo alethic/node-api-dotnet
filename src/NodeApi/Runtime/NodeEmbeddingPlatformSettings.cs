@@ -10,7 +10,7 @@ public class NodeEmbeddingPlatformSettings
     /// <summary>Path to the libnode shared library, or null to discover it.</summary>
     public string? LibNodePath { get; set; }
 
-    /// <summary>Path to the embedding shim shared library (nodeshim), or null to discover it.</summary>
+    /// <summary>Path to the embedding shim shared library (node-dotnet), or null to discover it.</summary>
     public string? LibNodeShimPath { get; set; }
 
     /// <summary>node::ProcessInitializationFlags passed to InitializeOncePerProcess.</summary>
