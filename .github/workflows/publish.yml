@@ -32,8 +32,9 @@ jobs:
     - name: Pack
       run: dotnet pack src/NodeApi/NodeApi.csproj --configuration Release
 
+    # Backslashes: on Windows, dotnet nuget push only expands the wildcard with them.
     - name: Push to GitHub Packages
-      run: dotnet nuget push "out/pkg/Alethic.NodeApi.*.nupkg" --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+      run: dotnet nuget push "out\pkg\Alethic.NodeApi.*.nupkg" --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
 
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
