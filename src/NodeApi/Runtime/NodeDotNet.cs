@@ -245,7 +245,7 @@ public static unsafe class NodeDotNet
 
     public static string[] ToStringArray(node_string_list list)
     {
-        if (list.Handle == default) return Array.Empty<string>();
+        if (list.Handle == default) return [];
         nuint count = node_string_list_count(list.Handle);
         string[] result = new string[count];
         for (nuint i = 0; i < count; i++)

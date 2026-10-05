@@ -241,6 +241,7 @@ public static class NodeEmbedding
         return exports;
     }
 
+#pragma warning disable IDE0060 // Unused parameter: the signature is the native callback's
 #if UNMANAGED_DELEGATES
     [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 #endif
@@ -288,6 +289,7 @@ public static class NodeEmbedding
             return default; // Empty MaybeLocal: the exception is pending.
         }
     }
+#pragma warning restore IDE0060
 
 #if UNMANAGED_DELEGATES
     [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
